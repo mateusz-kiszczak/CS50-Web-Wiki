@@ -1,0 +1,14 @@
+{% extends "wiki/layout.html" %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block body %}
+    <section>
+        {% block entry %}
+        {{ entry }}
+        {% endblock %}
+    </section>
+
+{% endblock %}
