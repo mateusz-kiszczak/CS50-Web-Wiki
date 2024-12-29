@@ -19,6 +19,14 @@ def save_entry(title, content):
     content. If an existing entry with the same title already exists,
     it is replaced.
     """
+
+    # Custom code that can added to this function.
+    # When saving a new entry, the h1 is not included at the top of the MD file.
+    # I combine the title and content arguments adding "#" to the tiltle (for md file purpose) 
+    # and adding the ampty line of code between title and content (for md file purpose).
+
+    # new_content = f"# {title}\n\n{content}\n"
+
     filename = f"entries/{title}.md"
     if default_storage.exists(filename):
         default_storage.delete(filename)

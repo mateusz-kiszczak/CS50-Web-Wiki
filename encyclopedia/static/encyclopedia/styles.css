@@ -36,3 +36,33 @@ textarea {
 .sidebar h2 {
     margin-top: 5px;
 }
+
+/* Create and edit entry form */
+
+.entryForm {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 60vw;
+}
+
+.entryForm label {
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.entryForm input,
+.entryForm textarea {
+    padding: 4px;
+}
+
+.entryForm textarea {
+    height: 400px;
+}
+
+.entryForm__button {
+    border-color: rgb(179, 179, 179);
+    border-radius: 10px;
+    font-size: 1.25em;
+    text-transform: uppercase;
+}
