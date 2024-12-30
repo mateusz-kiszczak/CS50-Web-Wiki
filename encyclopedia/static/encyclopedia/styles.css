@@ -39,30 +39,48 @@ textarea {
 
 /* Create and edit entry form */
 
-.entryForm {
+.entry-form {
     display: flex;
     flex-direction: column;
     gap: 24px;
     width: 60vw;
 }
 
-.entryForm label {
+.entry-form label {
     font-weight: 600;
     text-transform: uppercase;
 }
 
-.entryForm input,
-.entryForm textarea {
+.entry-form input,
+.entry-form textarea {
     padding: 4px;
 }
 
-.entryForm textarea {
+.entry-form textarea {
     height: 400px;
 }
 
-.entryForm__button {
+.entry-form__button {
     border-color: rgb(179, 179, 179);
     border-radius: 10px;
     font-size: 1.25em;
     text-transform: uppercase;
+}
+
+.error-message {
+    width: 30vw;
+    padding: 16px;
+    border-radius: 10px;
+    border: 2px solid rgb(161, 0, 0);
+    color: rgb(161, 0, 0);
+    font-weight: 600;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 24px 0;
+}
+
+.error-message > p {
+    margin: 0;
 }

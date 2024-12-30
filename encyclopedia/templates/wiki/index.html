@@ -1,4 +1,4 @@
-{% extends "wiki/layout.html" %}
+{% extends "encyclopedia/layout.html" %}
 
 {% block title %}
     {{ title }}
@@ -10,5 +10,5 @@
         {{ entry }}
         {% endblock %}
     </section>
-    <a href="editEntry/{{ title }}">Edit {{ title }}</a>
+    <a href="edit-entry/{{ title }}">Edit {{ title }}</a>
 {% endblock %}

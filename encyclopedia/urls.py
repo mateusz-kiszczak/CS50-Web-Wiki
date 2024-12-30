@@ -8,8 +8,9 @@ urlpatterns = [
     path("wiki/<str:entry>", views.entry, name="entry"),
     path("results/<str:query>", views.results, name="results"),
     path("results/wiki/<str:query>", views.reResults, name="reResults"),
-    path("newEntry/", views.newEntry, name="newEntry"),
-    # path("editEntry/", views.edit, name="edit"),
-    path("editEntry/<str:entry>", views.editEntry, name="editEntry"),
-    path("wiki/editEntry/<str:query>", views.reEditEntry, name="reEditEntry")
+    path("new-entry/", views.new_entry, name="new_entry"),
+    path("edit-entry/", views.edit, name="edit"),
+    path("edit-entry/<str:entry>", views.edit_entry, name="edit_entry"),
+    path("wiki/edit-entry/<str:query>", views.re_edit_entry, name="re_edit_entry"),
+    path("random-entry-page", views.random_entry_page, name="random_entry_page")
 ]

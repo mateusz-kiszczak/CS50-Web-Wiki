@@ -7,7 +7,11 @@ from django.urls import reverse
 
 from . import util
 
-# Create a form classes
+
+#
+# Form Classes
+#
+
 class NewSearchForm(forms.Form):
     q = forms.CharField(
         label = "",
@@ -19,7 +23,7 @@ class NewSearchForm(forms.Form):
     )
 
 class NewCreateForm(forms.Form):
-    createTitle = forms.CharField(
+    create_title = forms.CharField(
         label = "Title",
         widget = forms.TextInput(attrs = {
             "class": "search",
@@ -27,7 +31,7 @@ class NewCreateForm(forms.Form):
         })
     )
 
-    createContent = forms.CharField(
+    create_content = forms.CharField(
         label = "Content",
         widget = forms.Textarea(attrs = {
             "class": "search",
@@ -36,41 +40,48 @@ class NewCreateForm(forms.Form):
     )
 
 class NewEditForm(forms.Form):
-    editContent = forms.CharField(
+    edit_content = forms.CharField(
         label = "Edit Content",
         widget = forms.Textarea(attrs = {
             "class": "search"
         })
     )
 
+def search_form(request):
+    form = NewSearchForm(request.POST)
 
+    if form.is_valid():
+        query = form.cleaned_data["q"]
+    
+        # Get entries and convert all items to lowercase
+        entries = util.list_entries()
+        entires_lower_case = []
+    
+        for entry in entries:
+            entires_lower_case.append(entry.lower())
+    
+        if query in entires_lower_case:
+            return HttpResponseRedirect(f"wiki/{query}")
+        else:
+            return HttpResponseRedirect(f"results/{query}")
+    
+    return None
+
+#
+# Views Fucntions
+#
+
+# HOME page
 def index(request):
     # Search form
     if request.method == "POST":
-        form = NewSearchForm(request.POST)
-
-        if form.is_valid():
-            query = form.cleaned_data["q"]
-
-            # Get entries and convert all items to lowercase
-            entries = util.list_entries()
-            entiresLowerCase = []
-
-            for entry in entries:
-                entiresLowerCase.append(entry.lower())
-
-            if query in entiresLowerCase:
-                return HttpResponseRedirect(f"wiki/{query}")
-            else:
-                return HttpResponseRedirect(f"results/{query}")
-
-    # Random entry
-    random_entry = random.choice(util.list_entries())
+        response = search_form(request)
+        if response:
+            return response
 
     return render(request, "encyclopedia/index.html", {
         "entries": util.list_entries(),
-        "form": NewSearchForm(),
-        "random": random_entry
+        "form": NewSearchForm()
     })
 
 # When no entry is provided in 'wiki/ENTRY' url,
@@ -80,78 +91,104 @@ def wiki(request):
 
 # Get entry from the urls path and pass it as "entry" variable
 def entry(request, entry):   
+    # Search form
+    if request.method == "POST":
+        response = search_form(request)
+        if response:
+            return response
+    
     if util.get_entry(entry) == None:
-        return render(request, "wiki/error.html", {
+        return render(request, "encyclopedia/error.html", {
             "title": entry,
-            "entry": entry
+            "entry": entry,
+            "form": NewSearchForm()
         })
     else:
         return render(request, "wiki/index.html", {
             "title": entry,
-            "entry": util.get_entry(entry)
+            "entry": util.get_entry(entry),
+            "form": NewSearchForm()
         })
-    
+
+# Get search results.
 def results(request, query):
-    queryLower = query.lower()
+    # Search form
+    if request.method == "POST":
+        response = search_form(request)
+        if response:
+            return response
+        
+    query_lower = query.lower()
 
     # Get entries and convert all items to lowercase
     entries = util.list_entries()
-    entiresLowerCase = []
+    entires_lower_case = []
 
     for entry in entries:
-        entiresLowerCase.append(entry.lower())
+        entires_lower_case.append(entry.lower())
 
     # Check if query is included in list item, if yes add this item to a new list
-    entriesMatches = []
+    entries_matches = []
 
-    for index, entry in enumerate(entiresLowerCase):
-        if queryLower in entry:
-            entriesMatches.append(entries[index])
+    for index, entry in enumerate(entires_lower_case):
+        if query_lower in entry:
+            entries_matches.append(entries[index])
 
     return render(request, "results/index.html", {
         "title": query,
-        "matches": entriesMatches
+        "matches": entries_matches,
+        "form": NewSearchForm()
     })
 
 # Redirect from link from results
 def reResults(request, query):
     return HttpResponseRedirect(f"/wiki/{query}")
 
-def newEntry(request):
-    if request.method == "POST":
+# New Entry
+def new_entry(request):
+    # Search form
+    if request.method == "POST" and "q" in request.POST:
+        response = search_form(request)
+        if response:
+            return response
+    
+    # Create form
+    if request.method == "POST" and "create_title" in request.POST:
         form = NewCreateForm(request.POST)
 
         if form.is_valid():
-            entryTitle = form.cleaned_data["createTitle"]
-            entryContent = form.cleaned_data["createContent"]
+            entry_title = form.cleaned_data["create_title"]
+            entry_content = form.cleaned_data["create_content"]
 
             # Check if title already exists
             entries = util.list_entries()
 
             # Variable that will change to 1 if entry already exists
-            entryExists = 0
+            entry_exists = 0
 
             for entry in entries:
-                if entry.lower() == entryTitle.lower():
-                    entryExists = 1
+                if entry.lower() == entry_title.lower():
+                    entry_exists = 1
                     break
                     
-            if not entryExists:
+            if not entry_exists:
                 # Create a new md file using predefined function from util.py
-                util.save_entry(entryTitle, entryContent)
+                util.save_entry(entry_title, entry_content)
 
                 # Redirect to a new created entry
-                return HttpResponseRedirect(f"/wiki/{entryTitle}")
+                return HttpResponseRedirect(f"/wiki/{entry_title}")
             else:
-                return render(request, "newEntry/index.html", {
+                return render(request, "new-entry/index.html", {
                     "title": "Create a New Entry",
-                    "createForm": NewCreateForm(),
-                    "message": "Entry already exists!"
+                    "create_form": NewCreateForm(),
+                    "message": "Entry already exists!",
+                    "form": NewSearchForm()
                 })
 
-    return render(request, "newEntry/index.html", {
+    return render(request, "new-entry/index.html", {
         "title": "Create a New Entry",
-        "createForm": NewCreateForm()
+        "create_form": NewCreateForm(),
+        "form": NewSearchForm()
     })
 
 # When no entry is provided in 'editEntry/ENTRY' url,
@@ -160,48 +197,54 @@ def edit(request):
     return HttpResponseRedirect(reverse("index"))
 
 # Get entry from the urls path and pass it as "entry" variable
-def editEntry(request, entry):
-    if request.method == "POST":
+def edit_entry(request, entry):
+    # Search form
+    if request.method == "POST" and "q" in request.POST:
+        response = search_form(request)
+        if response:
+            return response
+    
+    # Edit form
+    if request.method == "POST" and "edit_content" in request.POST:
         form = NewEditForm(request.POST)
 
         if form.is_valid():
-            entry_content = form.cleaned_data["editContent"]
+            entry_content = form.cleaned_data["edit_content"]
             # Save (overwrite) the the md file
             util.save_entry(entry, entry_content)
             # Redirect to the entry with new changes
             return HttpResponseRedirect(f"../wiki/{entry}")
 
-    # Get entry content
-    entry_content = util.get_entry(entry)
+    if util.get_entry(entry) == None:
+        return render(request, "encyclopedia/error.html", {
+            "title": entry,
+            "entry": entry,
+            "form": NewSearchForm()
+        })
+    else:
+        # Get entry content
+        entry_content = util.get_entry(entry)
 
-    initial_data = {
-        "editContent": entry_content 
-    }
+        initial_data = {
+            "edit_content": entry_content 
+        }
 
-    # Pass enrty content to the form as an input value
-    form = NewEditForm(initial=initial_data)
+        # Pass enrty content to the form as an input value
+        form = NewEditForm(initial=initial_data)
 
-    return render(request, "editEntry/index.html", {
-        "title": "Edit an Entry",
-        "entry": entry,
-        "editForm": form
-    })
+        return render(request, "edit-entry/index.html", {
+            "title": "Edit an Entry",
+            "entry": entry,
+            "edit_form": form,
+            "form": NewSearchForm()
+        })
 
 # Redirect from link from wiki edit
-def reEditEntry(request, query):
-    return HttpResponseRedirect(f"/editEntry/{query}")
+def re_edit_entry(request, query):
+    return HttpResponseRedirect(f"/edit-entry/{query}")
 
+# Random entry
+def random_entry_page(request):
+    random_entry = random.choice(util.list_entries())
 
-
-# USE GIT AND COMMIT BEFORE MAKE BELOW CHANGES !!!!!!!!!!!!!!
-
-# find a way to make a working layout form in all html files
-# alternativly REMOVE layout or search form from other pages
-# BEST OPTION - create a separate apps for every functionality: wiki, results, new entry etc.
-
-# Remove all folders from "templates" and put files directly to "encyclopedia"
-
-# Check and manage dynamic titles and variable names (results)
-
-# One "layout" for all html files
-
+    return HttpResponseRedirect(f"wiki/{random_entry}")
