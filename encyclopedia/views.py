@@ -1,3 +1,4 @@
+import markdown2
 import random
 
 from django import forms
@@ -47,6 +48,11 @@ class NewEditForm(forms.Form):
         })
     )
 
+
+#
+# Search Form in layout.html
+#
+
 def search_form(request):
     form = NewSearchForm(request.POST)
 
@@ -66,6 +72,7 @@ def search_form(request):
             return HttpResponseRedirect(f"results/{query}")
     
     return None
+
 
 #
 # Views Fucntions
@@ -106,7 +113,7 @@ def entry(request, entry):
     else:
         return render(request, "wiki/index.html", {
             "title": entry,
-            "entry": util.get_entry(entry),
+            "entry": markdown2.markdown(util.get_entry(entry)),
             "form": NewSearchForm()
         })
 

@@ -7,7 +7,7 @@
 {% block body %}
     <section>
         {% block entry %}
-        {{ entry }}
+        {{ entry|safe }}
         {% endblock %}
     </section>
     <a href="edit-entry/{{ title }}">Edit {{ title }}</a>
