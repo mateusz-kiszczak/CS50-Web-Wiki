@@ -8,6 +8,6 @@ CS50 WEB - Week 3 - Django
 
 ## Project to do
 
-Visit the following link to read the instructions for solving the problem:
+Visit the following link to read the project instructions:
 
 [Link to the Project 1 - Wiki](https://cs50.harvard.edu/web/projects/1/wiki)
